@@ -25,7 +25,7 @@ is interpreted like so:
     bam: ["true", "\"indeed\""] # You can pass multiple arguments to one keyword
   }
 
-LIST OF COMMANDS:  =====================================================
+LIST OF COMMANDS:  ==========================
 
 stats         Args: -
               Show village statistics and info
