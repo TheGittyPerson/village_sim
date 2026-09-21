@@ -82,7 +82,7 @@ class Village
                 else
                   new.title
                 end
-    puts "\nName successfully set!"
+    puts "\nName successfully set to #{name}!"
     save_data
   end
 
