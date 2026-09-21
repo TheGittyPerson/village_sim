@@ -14,25 +14,26 @@ class CommandParser
 
   # Prompts the user for a command and execute it
   def prompt_command
-    inp = input("\n>> ").split
+    inp = input("\n>> ")
     return if inp.empty?
 
-    execute(inp.first.to_sym, inp[1..] || [])
+    execute(inp)
   end
 
   # Executes a command.
   #
   # Any extra arguments are ignored.
   # Throws +:quit+ when quit command received.
-  # @param command [Symbol]
-  # @param args [Array<Object>]
-  def execute(command, args)
-    args = self.class.separate_args *args
-    case command
+  # @param command [String]
+  def execute(command)
+    (action, *args_unparsed) = command.split
+    args = self.class.separate_args args_unparsed
+
+    case action.to_sym
     when :stats
       @sim.village.show_stats
     when :rename
-      @sim.village.change_name(args.first)
+      @sim.village.change_name(args[:*].first)
     when :clearscreen
       @sim.show_header
     when :help
@@ -69,7 +70,7 @@ class CommandParser
   #
   # @param args [Array<String>]
   # @return [Hash{Symbol => Array<String>}]
-  def self.separate_args(*args)
+  def self.separate_args(args)
     raise TypeError, "Expected Array, got #{args.class}" unless args.is_a? Array
 
     out = { :* => [] }
