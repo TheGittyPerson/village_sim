@@ -67,7 +67,7 @@ class Village
 
   # Output village stats
   def show_stats
-    puts "\n" + "~~~ #{name.upcase} STATS ~~~".win_center
+    puts "\n" + "~~~ #{name.upcase} VILLAGE STATS ~~~".win_center
     puts
 
     puts "Population: #{@population}"
