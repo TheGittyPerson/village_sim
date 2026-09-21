@@ -16,6 +16,20 @@ class String
     center($stdout.winsize.last, pad_string)
   end
 
+  # Left-justify a string based on the window width
+  # @param pad_string [String]
+  # @return [String]
+  def win_ljust(pad_string = " ")
+    ljust($stdout.winsize.last, pad_string)
+  end
+
+  # Right-justify a string based on the window width
+  # @param pad_string [String]
+  # @return [String]
+  def win_rjust(pad_string = " ")
+    rjust($stdout.winsize.last, pad_string)
+  end
+
   # @return [String]
   def bold
     "\e[1m#{self}\e[0m"
