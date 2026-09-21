@@ -1,0 +1,50 @@
+VILLAGE SIM {VERSION} — Help
+
+Commands are parsed similarly to shell commands.
+
+The first word of the command is the action.
+Everything following the action are either positional or keyword arguments.
+
+Positional arguments immediately follow the action.
+
+Keywords are written with either one or two dashes (e.g., -verbose / --verbose).
+Any number of values can be passed to one keyword.
+With values, keyword arguments act like shell command options.
+Without any values, they act like flags.
+
+The following command:
+
+  >> foo bar 123 --shiz biz -poof --bam true "indeed"
+
+is interpreted like so:
+
+  {
+    *: ["bar", "123"],          # Positional arguments, right after the action
+    shiz: ["biz"],              # Keyword argument
+    poof: [],                   # Keyword without any arguments acts as a flag
+    bam: ["true", "\"indeed\""] # You can pass multiple arguments to one keyword
+  }
+
+LIST OF COMMANDS:  =====================================================
+
+stats         Args: -
+              Show village statistics and info
+
+rename        Args: New name (optional)
+              Change village name
+
+clearscreen   Args: -
+              Reset the screen
+
+
+help          Args: -
+              Show this help message
+
+
+debug         Args: Variable name (optional)
+              Call methods to see their return value.
+              This runs from the scope of the main VillageSim instance.
+              Enter without arguments to start interactive session.
+
+
+quit / exit   Quit the program

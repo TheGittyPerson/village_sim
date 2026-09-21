@@ -1,0 +1,33 @@
+# Ruby
+*.gem
+.bundle/
+vendor/bundle/
+
+# Bundler
+Gemfile.lock
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Ruby / system files
+*.rbc
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+.env.*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Project-specific files
+village_data.json
