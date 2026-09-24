@@ -15,6 +15,9 @@ class VillageSim
   attr_reader :data
 
   def initialize
+    @json_file_name = 'village_sim_data.json'
+    @json_file_path = __dir__ + '/' + @json_file_name
+
     @data = load_data # @type [Hash{Symbol => Object}]
     @village = Village.new(self)
     @parser = CommandParser.new(self)
@@ -48,7 +51,7 @@ class VillageSim
 
   # Load JSON data from a file and parse as a Hash.
   # Keys are symbolized.
-  # @return [Hash{Symbol => Object}]
+  # @return [Hash]
   def load_data
     return {} unless File.exist? @json_file_path
     contents = File.read(@json_file_path)
@@ -67,10 +70,14 @@ class VillageSim
   def show_header
     $stdout.clear_screen
     puts "\n" + " VILLAGE SIM! ".win_center("*=")
+    puts "\nEnter 'help' for a list of commands."
   end
 
-  def show_help
+  # @param commands [Boolean] whether to show list of commands only.
+  def show_help(commands)
+    contents = File.read("#{__dir__}/help.txt")
+    contents = contents.partition("LIST OF COMMANDS")[1..].join if commands
     puts
-    puts File.read("#{__dir__}/help.txt").gsub("{VERSION}", VERSION)
+    puts contents.gsub("{VERSION}", VERSION)
   end
 end

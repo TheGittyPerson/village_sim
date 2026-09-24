@@ -12,13 +12,12 @@ class Village
   def initialize(sim)
     @sim = sim
 
-    @json_file_name = 'village_data.json'
-    @json_file_path = __dir__ + '/' + @json_file_name
+    data = @sim.load_data.fetch(:village_info) do
+      raise "Data missing :village_info"
+    end
 
-    data = load_data
-
-    @village_data_keys = []
-    @name       = add_data(data, :name, "Unnamed Village")   # @type [String]
+    @village_info_keys = []
+    @name       = add_data(data, :name, "Unnamed")           # @type [String]
     @population = add_data(data, :population, 1)             # @type [Integer]
     @happiness  = add_data(data, :happiness, 100)            # @type [Integer]
     @knowledge  = add_data(data, :knowledge, 0)              # @type [Integer]
@@ -30,7 +29,7 @@ class Village
   # Loops through the Symbols in +@village_data_keys+ and creates new getters
   # methods for each respective instance variable they refer to.
   def add_data_getters
-    @village_data_keys.each do |key|
+    @village_info_keys.each do |key|
       self.class.send(:define_method, key) { instance_variable_get("@#{key}") }
     end
   end
@@ -96,15 +95,20 @@ class Village
     raise TypeError, "Expected Hash, got #{data.class}" unless data.is_a? Hash
     raise TypeError, "Expected Symbol, got #{key.class}" unless key.is_a? Symbol
 
-    @village_data_keys << key
+    @village_info_keys << key
     data.fetch(key, default)
   end
 
-  # Serializes village data as a Hash
+  # Serializes village info as a Hash
   # @return [Hash{Symbol => Object}]
-  def data_as_hash
-    @village_data_keys.to_h { |sym|
+  def village_info_as_hash
+    @village_info_keys.to_h { |sym|
       [sym, instance_variable_get("@#{sym}")]
     }
+  end
+
+  # Update +VillageSim.data+ and call the main +save_data+ method.
+  def save_data
+    @sim.data[:village_info]
   end
 end

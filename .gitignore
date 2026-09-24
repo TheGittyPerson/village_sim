@@ -30,4 +30,4 @@ Thumbs.db
 *.swo
 
 # Project-specific files
-village_data.json
+village_sim_data.json

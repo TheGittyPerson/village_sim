@@ -39,7 +39,7 @@ class CommandParser
     when :clearscreen
       @sim.show_header
     when :help
-      @sim.show_help
+      @sim.show_help(args.include? :commands)
     when :debug
       Debugger.debug_command(args[:*], @sim)
     when :quit, :exit
