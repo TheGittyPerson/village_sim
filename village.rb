@@ -21,7 +21,7 @@ class Village
     @name       = add_data(data, :name, "Unnamed Village")   # @type [String]
     @population = add_data(data, :population, 1)             # @type [Integer]
     @happiness  = add_data(data, :happiness, 100)            # @type [Integer]
-    @knowledge  = add_data(data, :knowledge, 100)            # @type [Integer]
+    @knowledge  = add_data(data, :knowledge, 0)              # @type [Integer]
     add_data_getters
 
     save_data if data.empty?
@@ -71,12 +71,12 @@ class Village
     puts
 
     puts "Population: #{@population}"
-    puts "Happiness: #{@happiness}"
+    puts "Happiness: #{@happiness}%"
     puts "Knowledge: #{@knowledge}"
   end
 
   # @param new [String] or nil, which will show a prompt instead.
-  def change_name(new = nil)
+  def rename(new = nil)
     self.name = if new.nil?
                   input("\nGive your village a new name: ").title
                 else
@@ -106,23 +106,5 @@ class Village
     @village_data_keys.to_h { |sym|
       [sym, instance_variable_get("@#{sym}")]
     }
-  end
-
-  # Load JSON data from a file and parse as a Hash.
-  # Keys are symbolized.
-  # @return [Hash{Symbol => Object}]
-  def load_data
-    return {} unless File.exist? @json_file_path
-    contents = File.read(@json_file_path)
-    JSON.parse(contents, symbolize_names: true)
-  end
-
-  # Save village data to the JSON file.
-  def save_data
-    File.write(
-      @json_file_path,
-      JSON.pretty_generate(data_as_hash)
-    )
-    nil
   end
 end

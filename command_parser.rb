@@ -30,10 +30,12 @@ class CommandParser
     args = self.class.separate_args args_unparsed
 
     case action.to_sym
+    when :next
+      @sim.village.next_day
     when :stats
       @sim.village.show_stats
     when :rename
-      @sim.village.change_name(args[:*].first)
+      @sim.village.rename(args[:*].first)
     when :clearscreen
       @sim.show_header
     when :help
