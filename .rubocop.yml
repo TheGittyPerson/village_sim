@@ -1,0 +1,71 @@
+AllCops:
+  TargetRubyVersion: 3.3
+  ParserEngine: parser_prism
+  StyleGuideBaseURL: https://rubystyle.guide
+  NewCops: enable
+
+Layout/LineLength:
+  Max: 80
+
+Layout/EmptyLines:
+  Enabled: false
+
+Layout/EmptyLineBetweenDefs:
+  NumberOfEmptyLines: [1, 2]
+
+Layout/TrailingWhitespace:
+  Enabled: false
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Lint/AmbiguousOperatorPrecedence:
+  Enabled: false
+
+Lint/UselessAssignment:
+  Enabled: false
+
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Metrics:
+  Enabled: false
+
+Style/OneClassPerFile:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+Style/StringConcatenation:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/YodaCondition:
+  Enabled: false
+
+Style/AccessModifierDeclarations:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/BlockComments:
+  Enabled: false
+
+Style/NestedParenthesizedCalls:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/PredicateMethod:
+  Enabled: false
