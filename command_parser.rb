@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
+require_relative "action_marker"
 require_relative "ui_utils"
 require_relative "debugger"
 require_relative "version"
 
 class CommandParser
   include UIUtils
+  extend ActionMarker
 
   # @param sim [VillageSim]
   def initialize(sim)
@@ -30,7 +32,7 @@ class CommandParser
     args = self.class.separate_args args_unparsed
 
     case action.to_sym
-    when :next
+    when :nextday
       @sim.village.next_day
     when :stats
       @sim.village.show_stats

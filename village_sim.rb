@@ -4,12 +4,15 @@ require "json"
 require "io/console"
 
 require_relative "village"
+require_relative "action_marker"
 require_relative "command_parser"
+require_relative "debugger"
 require_relative "ui_utils"
 
 # Main game class
 class VillageSim
   include UIUtils
+  extend ActionMarker
 
   attr_accessor :village, :parser
   attr_reader :data
@@ -19,8 +22,9 @@ class VillageSim
     @json_file_path = __dir__ + '/' + @json_file_name
 
     @data = load_data # @type [Hash{Symbol => Object}]
-    @village = Village.new(self)
+    @village = Village.new(self) # @type [Village]
     @parser = CommandParser.new(self)
+    @debugger = Debugger.new(self)
   end
 
   # Main loop
@@ -31,6 +35,19 @@ class VillageSim
         @parser.prompt_command
       end
     end
+  end
+
+  # Show help message.
+  #
+  # If the `commands` or `c` flag is passed, only shows the list of commands.
+  # @param args [Hash]
+  action def help(args)
+    contents = File.read("#{__dir__}/help.txt")
+    if args.include?(:commands) || args.include?(:c)
+      contents = contents.partition("LIST OF COMMANDS")[1..].join
+    end
+    puts
+    puts contents.gsub("{VERSION}", VERSION)
   end
 
   # @param hash [Hash{Symbol => Object}]
@@ -67,22 +84,10 @@ class VillageSim
     nil
   end
 
+  # Show game header.
   def show_header
     $stdout.clear_screen
     puts "\n" + " VILLAGE SIM! ".win_center("*=")
     puts "\nEnter 'help' for a list of commands."
-  end
-
-  # Show help message.
-  #
-  # If the `commands` or `c` flag is passed, only shows the list of commands.
-  # @param args [Hash]
-  def show_help(args)
-    contents = File.read("#{__dir__}/help.txt")
-    if args.include?(:commands) || args.include?(:c)
-      contents = contents.partition("LIST OF COMMANDS")[1..].join
-    end
-    puts
-    puts contents.gsub("{VERSION}", VERSION)
   end
 end

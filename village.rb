@@ -2,11 +2,14 @@
 
 require "io/console"
 
+require_relative "village_sim"
+require_relative "action_marker"
 require_relative "ui_utils"
 
 # Represent a village
 class Village
   include UIUtils
+  extend ActionMarker
 
   # @param sim [VillageSim]
   def initialize(sim)
@@ -21,14 +24,39 @@ class Village
     @population = add_data(data, :population, 1)             # @type [Integer]
     @happiness  = add_data(data, :happiness, 100)            # @type [Integer]
     @knowledge  = add_data(data, :knowledge, 0)              # @type [Integer]
-    add_data_getters
+    add_info_getters
 
     save_data if data.empty?
   end
 
+  # Move on to the next day in the simulation.
+  #
+  # Accepts an integer command argument that defines how many days to move
+  # ahead by.
+  # @param args [Hash]
+  action def next_day(args)
+    incr = args[:*].first || 1
+    puts "\nMoving forward by #{days} day(s)...\n"
+    self.day += incr
+  end
+
+  # Current day of simulation. First visit starts on Day 0.
+  # @return [Integer]
+  def day
+    @sim.data.fetch(:day) do
+      raise "Data missing key :day"
+    end
+  end
+
+  # Set day number in data Hash. Does *NOT* save to file.
+  # @param number [Integer]
+  def day=(number)
+    @sim.data[:day] = number
+  end
+
   # Loops through the Symbols in +@village_data_keys+ and creates new getters
   # methods for each respective instance variable they refer to.
-  def add_data_getters
+  def add_info_getters
     @village_info_keys.each do |key|
       self.class.send(:define_method, key) { instance_variable_get("@#{key}") }
     end

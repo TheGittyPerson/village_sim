@@ -2,25 +2,26 @@
 
 require_relative "ui_utils"
 
-module Debugger
+class Debugger
   extend UIUtils
 
-  module_function
+  # @param sim [VillageSim]
+  def initialize(sim)
+    @sim = sim
+  end
 
   # Parse debug command
   # @param args [Hash]
-  # @param base_object [VillageSim]
-  def debug_command(args, base_object)
+  def debug_command(args)
     if args[:*].empty?
-      start_interactive_debug base_object
+      start_interactive_debug
     else
-      puts "\n=> #{lookup_value(args[:*], base_object)}"
+      puts "\n=> #{lookup_value(args[:*])}"
     end
   end
 
   # Start an interactive debug session
-  # @param base_object [Object]
-  def start_interactive_debug(base_object)
+  def start_interactive_debug
     puts
     puts "?-- Interactive Debug --?".win_center
     puts "\nType 'help' for help."
@@ -30,7 +31,7 @@ module Debugger
       when "help" then show_help
       when "quit", "exit" then break
       else
-        puts "\n=> #{lookup_value(inp.split, base_object)}"
+        puts "\n=> #{lookup_value(inp.split)}"
       end
     end
     puts "\nExited Interactive Debug"
@@ -38,9 +39,8 @@ module Debugger
 
   # Look up the return value of a method and return the value.
   # @param cmd_args [Array<String>]
-  # @param [Object]
   # @return [String]
-  def lookup_value(cmd_args, base_object)
+  def lookup_value(cmd_args)
     unless cmd_args.is_a? Array
       raise TypeError, "Expected Array, got #{cmd_args.class}"
     end
@@ -48,7 +48,7 @@ module Debugger
     full_method, *args = cmd_args
     methods = full_method.split('.')
 
-    current_value = base_object
+    current_value = @sim
 
     methods.each_with_index do |method_name, index|
       is_last_method = (index == methods.size - 1)
