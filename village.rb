@@ -74,12 +74,16 @@ class Village
     puts "Knowledge: #{@knowledge}"
   end
 
-  # @param new [String] or nil, which will show a prompt instead.
-  def rename(new = nil)
-    self.name = if new.nil?
+  # Renames the village.
+  #
+  # Directly uses the passed argument from the command if given, otherwise
+  # uses a prompt.
+  # @param args [Hash]
+  def rename(args)
+    self.name = if args[:*].first.nil?
                   input("\nGive your village a new name: ").title
                 else
-                  new.title
+                  args[:*].first.title
                 end
     puts "\nName successfully set to #{name}!"
     save_data

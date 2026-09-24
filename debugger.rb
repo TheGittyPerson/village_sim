@@ -8,13 +8,13 @@ module Debugger
   module_function
 
   # Parse debug command
-  # @param args [Array<String>]
+  # @param args [Hash]
   # @param base_object [VillageSim]
   def debug_command(args, base_object)
-    if args.empty?
+    if args[:*].empty?
       start_interactive_debug base_object
     else
-      puts "\n=> #{lookup_value(args, base_object)}"
+      puts "\n=> #{lookup_value(args[:*], base_object)}"
     end
   end
 

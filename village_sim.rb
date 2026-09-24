@@ -73,10 +73,15 @@ class VillageSim
     puts "\nEnter 'help' for a list of commands."
   end
 
-  # @param commands [Boolean] whether to show list of commands only.
-  def show_help(commands)
+  # Show help message.
+  #
+  # If the `commands` flag is passed, only shows the list of commands.
+  # @param args [Hash]
+  def show_help(args)
     contents = File.read("#{__dir__}/help.txt")
-    contents = contents.partition("LIST OF COMMANDS")[1..].join if commands
+    if args.include? :commands
+      contents = contents.partition("LIST OF COMMANDS")[1..].join
+    end
     puts
     puts contents.gsub("{VERSION}", VERSION)
   end

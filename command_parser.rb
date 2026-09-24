@@ -35,13 +35,13 @@ class CommandParser
     when :stats
       @sim.village.show_stats
     when :rename
-      @sim.village.rename(args[:*].first)
+      @sim.village.rename(args)
     when :clearscreen
       @sim.show_header
     when :help
-      @sim.show_help(args.include? :commands)
+      @sim.show_help(args)
     when :debug
-      Debugger.debug_command(args[:*], @sim)
+      Debugger.debug_command(args, @sim)
     when :quit, :exit
       throw :quit
     else error "Command unrecognized :("
