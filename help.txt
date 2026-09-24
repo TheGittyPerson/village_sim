@@ -41,8 +41,9 @@ clearscreen   Args: -
               Reset the screen
 
 
-help          Args: -
+help          Args: -commands / -c
               Show this help message
+              Only shows list of commands if the -commands or -c flag is given.
 
 
 debug         Args: Variable name (optional)

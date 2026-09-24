@@ -75,11 +75,11 @@ class VillageSim
 
   # Show help message.
   #
-  # If the `commands` flag is passed, only shows the list of commands.
+  # If the `commands` or `c` flag is passed, only shows the list of commands.
   # @param args [Hash]
   def show_help(args)
     contents = File.read("#{__dir__}/help.txt")
-    if args.include? :commands
+    if args.include?(:commands) || args.include?(:c)
       contents = contents.partition("LIST OF COMMANDS")[1..].join
     end
     puts
