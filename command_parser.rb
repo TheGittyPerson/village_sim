@@ -35,6 +35,7 @@ class CommandParser
     case action
     when :day             then @sim.village.show_day
     when :nextday         then @sim.village.next_day
+    when :save            then @sim.save_data
     when :stats           then @sim.village.stats
     when :rename          then @sim.village.rename
     when :clearscreen     then @sim.clear_screen

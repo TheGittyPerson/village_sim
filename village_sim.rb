@@ -37,6 +37,15 @@ class VillageSim
 
   # @!group
 
+  # Save village data to the JSON file.
+  def save_data
+    File.write(
+      @json_file_path,
+      JSON.pretty_generate(data)
+    )
+    puts "\nGame saved successfully!"
+  end
+
   def clear_screen
     show_header
   end
@@ -76,15 +85,6 @@ class VillageSim
     return {} unless File.exist? @json_file_path
     contents = File.read(@json_file_path)
     JSON.parse(contents, symbolize_names: true)
-  end
-
-  # Save village data to the JSON file.
-  def save_data
-    File.write(
-      @json_file_path,
-      JSON.pretty_generate(data)
-    )
-    nil
   end
 
   # Clears screen and shows game header.
