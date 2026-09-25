@@ -4,7 +4,6 @@ require "json"
 require "io/console"
 
 require_relative "village"
-require_relative "action_marker"
 require_relative "command_parser"
 require_relative "debugger"
 require_relative "ui_utils"
@@ -12,7 +11,6 @@ require_relative "ui_utils"
 # Main game class
 class VillageSim
   include UIUtils
-  extend ActionMarker
 
   attr_accessor :village, :parser
   attr_reader :data
@@ -22,9 +20,9 @@ class VillageSim
     @json_file_path = __dir__ + '/' + @json_file_name
 
     @data = load_data # @type [Hash{Symbol => Object}]
-    @village = Village.new(self) # @type [Village]
-    @parser = CommandParser.new(self)
-    @debugger = Debugger.new(self)
+    @village = Village.new(self)                  # @type [Village]
+    @debugger = Debugger.new(self)                # @type [Debugger]
+    @parser = CommandParser.new(self)             # @type [CommandParser]
   end
 
   # Main loop
@@ -37,11 +35,15 @@ class VillageSim
     end
   end
 
-  # Show help message.
-  #
+  # @!group
+
+  def clear_screen
+    show_header
+  end
+
   # If the `commands` or `c` flag is passed, only shows the list of commands.
   # @param args [Hash]
-  action def help(args)
+  def help(args)
     contents = File.read("#{__dir__}/help.txt")
     if args.include?(:commands) || args.include?(:c)
       contents = contents.partition("LIST OF COMMANDS")[1..].join
@@ -49,6 +51,15 @@ class VillageSim
     puts
     puts contents.gsub("{VERSION}", VERSION)
   end
+
+  # If variable name given, immediately evaluates and outputs value.
+  # Otherwise, starts interactive session.
+  # @param args [Hash]
+  def debug(args)
+    @debug.debug_command(args)
+  end
+
+  # @!endgroup
 
   # @param hash [Hash{Symbol => Object}]
   def data=(hash)
@@ -84,7 +95,7 @@ class VillageSim
     nil
   end
 
-  # Show game header.
+  # Clears screen and shows game header.
   def show_header
     $stdout.clear_screen
     puts "\n" + " VILLAGE SIM! ".win_center("*=")

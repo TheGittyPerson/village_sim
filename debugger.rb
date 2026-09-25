@@ -10,7 +10,7 @@ class Debugger
     @sim = sim
   end
 
-  # Parse debug command
+  # Parses debug command.
   # @param args [Hash]
   def debug_command(args)
     if args[:*].empty?
@@ -20,7 +20,7 @@ class Debugger
     end
   end
 
-  # Start an interactive debug session
+  # Starts an interactive debug session.
   def start_interactive_debug
     puts
     puts "?-- Interactive Debug --?".win_center
@@ -37,7 +37,7 @@ class Debugger
     puts "\nExited Interactive Debug"
   end
 
-  # Look up the return value of a method and return the value.
+  # Looks up the return value of a method and return the value.
   # @param cmd_args [Array<String>]
   # @return [String]
   def lookup_value(cmd_args)
@@ -66,7 +66,7 @@ class Debugger
     current_value.inspect
   end
 
-  # Guessed what type the user-inputted string is supposed to be
+  # Guesses what type the user-inputted string is supposed to be
   # and converts it.
   # @param arg [String]
   # @return [String, Integer, Float, Symbol, Boolean]
@@ -81,6 +81,7 @@ class Debugger
     end
   end
 
+  # Shows interactive debug help message.
   def show_help
     puts "\nINTERACTIVE DEBUG MODE — Help".bold
     puts "\nType in the names of any method to call them."

@@ -2,14 +2,11 @@
 
 require "io/console"
 
-require_relative "village_sim"
-require_relative "action_marker"
 require_relative "ui_utils"
 
 # Represent a village
 class Village
   include UIUtils
-  extend ActionMarker
 
   # @param sim [VillageSim]
   def initialize(sim)
@@ -29,16 +26,46 @@ class Village
     save_data if data.empty?
   end
 
-  # Move on to the next day in the simulation.
+  # @!group Command Action Methods
+
+  # Move on to the next day in the simulation. This is a command action method.
   #
   # Accepts an integer command argument that defines how many days to move
   # ahead by.
   # @param args [Hash]
-  action def next_day(args)
+  def next_day(args)
     incr = args[:*].first || 1
-    puts "\nMoving forward by #{days} day(s)...\n"
+    puts "\nMoving forward by #{incr} day(s)...\n"
     self.day += incr
+    save_data
   end
+
+  # Outputs village stats. This is a command action method.
+  def stats
+    puts "\n" + "~~~ #{name.upcase} VILLAGE STATS ~~~".win_center
+    puts
+
+    puts "Population: #{@population}"
+    puts "Happiness: #{@happiness}%"
+    puts "Knowledge: #{@knowledge}"
+  end
+
+  # Renames the village. This is a command action method.
+  #
+  # Directly uses the passed argument from the command if given, otherwise
+  # uses a prompt.
+  # @param args [Hash]
+  def rename(args)
+    self.name = if args[:*].first.nil?
+                  input("\nGive your village a new name: ").title
+                else
+                  args[:*].first.title
+                end
+    puts "\nName successfully set to #{name}!"
+    save_data
+  end
+
+  # @!endgroup
 
   # Current day of simulation. First visit starts on Day 0.
   # @return [Integer]
@@ -90,31 +117,6 @@ class Village
       raise TypeError, "Expected Integer, got #{int.class}"
     end
     @happiness = int.clamp(0, 100)
-  end
-
-  # Output village stats
-  def show_stats
-    puts "\n" + "~~~ #{name.upcase} VILLAGE STATS ~~~".win_center
-    puts
-
-    puts "Population: #{@population}"
-    puts "Happiness: #{@happiness}%"
-    puts "Knowledge: #{@knowledge}"
-  end
-
-  # Renames the village.
-  #
-  # Directly uses the passed argument from the command if given, otherwise
-  # uses a prompt.
-  # @param args [Hash]
-  def rename(args)
-    self.name = if args[:*].first.nil?
-                  input("\nGive your village a new name: ").title
-                else
-                  args[:*].first.title
-                end
-    puts "\nName successfully set to #{name}!"
-    save_data
   end
 
   # Performs a normal +fetch+ operation, but also adds the symbol keys to

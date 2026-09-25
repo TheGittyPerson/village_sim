@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
-require_relative "action_marker"
 require_relative "ui_utils"
 require_relative "debugger"
 require_relative "version"
 
 class CommandParser
   include UIUtils
-  extend ActionMarker
 
   # @param sim [VillageSim]
   def initialize(sim)
     @sim = sim # @type [VillageSim]
+    @command = {} # @type [Hash]
   end
 
   # Prompts the user for a command and execute it
@@ -35,7 +34,7 @@ class CommandParser
     when :nextday
       @sim.village.next_day
     when :stats
-      @sim.village.show_stats
+      @sim.village.stats
     when :rename
       @sim.village.rename(args)
     when :clearscreen
@@ -43,7 +42,7 @@ class CommandParser
     when :help
       @sim.show_help(args)
     when :debug
-      Debugger.debug_command(args, @sim)
+      @sim.debug(args)
     when :quit, :exit
       throw :quit
     else error "Command unrecognized :("
@@ -74,7 +73,7 @@ class CommandParser
   #
   # @param args [Array<String>]
   # @return [Hash{Symbol => Array<String>}]
-  def self.separate_args(args)
+  def self.separate_args(args) # TODO: make this instanc meth
     raise TypeError, "Expected Array, got #{args.class}" unless args.is_a? Array
 
     out = { :* => [] }
