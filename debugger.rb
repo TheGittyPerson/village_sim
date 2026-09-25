@@ -3,20 +3,21 @@
 require_relative "ui_utils"
 
 class Debugger
-  extend UIUtils
+  include UIUtils
 
   # @param sim [VillageSim]
   def initialize(sim)
     @sim = sim
+    @cmd_args = {}
   end
 
   # Parses debug command.
-  # @param args [Hash]
-  def debug_command(args)
-    if args[:*].empty?
+  def debug
+    @cmd_args = @sim.parser.args
+    if @cmd_args[:*].empty?
       start_interactive_debug
     else
-      puts "\n=> #{lookup_value(args[:*])}"
+      puts "\n=> #{lookup_value(@cmd_args[:*])}"
     end
   end
 
@@ -38,14 +39,14 @@ class Debugger
   end
 
   # Looks up the return value of a method and return the value.
-  # @param cmd_args [Array<String>]
+  # @param dbg_args [Array<String>]
   # @return [String]
-  def lookup_value(cmd_args)
-    unless cmd_args.is_a? Array
-      raise TypeError, "Expected Array, got #{cmd_args.class}"
+  def lookup_value(dbg_args)
+    unless dbg_args.is_a? Array
+      raise TypeError, "Expected Array, got #{dbg_args.class}"
     end
     
-    full_method, *args = cmd_args
+    full_method, *args = dbg_args
     methods = full_method.split('.')
 
     current_value = @sim

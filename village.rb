@@ -32,9 +32,8 @@ class Village
   #
   # Accepts an integer command argument that defines how many days to move
   # ahead by.
-  # @param args [Hash]
-  def next_day(args)
-    incr = args[:*].first || 1
+  def next_day
+    incr = @sim.parser.args[:*].first || 1
     puts "\nMoving forward by #{incr} day(s)...\n"
     self.day += incr
     save_data
@@ -54,12 +53,11 @@ class Village
   #
   # Directly uses the passed argument from the command if given, otherwise
   # uses a prompt.
-  # @param args [Hash]
-  def rename(args)
-    self.name = if args[:*].first.nil?
+  def rename
+    self.name = if @sim.parser.args[:*].first.nil?
                   input("\nGive your village a new name: ").title
                 else
-                  args[:*].first.title
+                  @sim.parser.args[:*].first.title
                 end
     puts "\nName successfully set to #{name}!"
     save_data

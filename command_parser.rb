@@ -7,10 +7,13 @@ require_relative "version"
 class CommandParser
   include UIUtils
 
+  attr_accessor :action, :args
+
   # @param sim [VillageSim]
   def initialize(sim)
     @sim = sim # @type [VillageSim]
-    @command = {} # @type [Hash]
+    @action = nil # @type [String, nil]
+    @args = {} # @type [Hash]
   end
 
   # Prompts the user for a command and execute it
@@ -18,33 +21,25 @@ class CommandParser
     inp = input("\n>> ")
     return if inp.empty?
 
-    execute(inp)
+    @action = inp.split.first.to_sym
+    @args = hashify_args(inp.split[1..] || [])
+
+    execute
   end
 
   # Executes a command.
   #
   # Any extra arguments are ignored.
   # Throws +:quit+ when quit command received.
-  # @param command [String]
-  def execute(command)
-    (action, *args_unparsed) = command.split
-    args = self.class.separate_args args_unparsed
-
-    case action.to_sym
-    when :nextday
-      @sim.village.next_day
-    when :stats
-      @sim.village.stats
-    when :rename
-      @sim.village.rename(args)
-    when :clearscreen
-      @sim.show_header
-    when :help
-      @sim.show_help(args)
-    when :debug
-      @sim.debug(args)
-    when :quit, :exit
-      throw :quit
+  def execute
+    case action
+    when :nextday         then @sim.village.next_day
+    when :stats           then @sim.village.stats
+    when :rename          then @sim.village.rename
+    when :clearscreen     then @sim.clear_screen
+    when :help            then @sim.help
+    when :debug           then @sim.debugger.debug
+    when :quit, :exit     then throw :quit
     else error "Command unrecognized :("
     end
   end
@@ -71,14 +66,16 @@ class CommandParser
   #     bam: ["true", "\"indeed\""] # Multiple values can be passed to 1 keyword
   #   }
   #
-  # @param args [Array<String>]
+  # @param args_str [Array<String>]
   # @return [Hash{Symbol => Array<String>}]
-  def self.separate_args(args) # TODO: make this instanc meth
-    raise TypeError, "Expected Array, got #{args.class}" unless args.is_a? Array
+  def hashify_args(args_str)
+    unless args_str.is_a? Array
+      raise TypeError, "Expected Array, got #{args_str.class}"
+    end
 
     out = { :* => [] }
 
-    chunks = args.slice_before { |arg| arg.start_with?("-") }
+    chunks = args_str.slice_before { |arg| arg.start_with?("-") }
     chunks.each do |chunk|
       first_item = chunk.first
 

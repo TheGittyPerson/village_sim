@@ -12,7 +12,7 @@ require_relative "ui_utils"
 class VillageSim
   include UIUtils
 
-  attr_accessor :village, :parser
+  attr_accessor :village, :parser, :debugger
   attr_reader :data
 
   def initialize
@@ -42,21 +42,13 @@ class VillageSim
   end
 
   # If the `commands` or `c` flag is passed, only shows the list of commands.
-  # @param args [Hash]
-  def help(args)
+  def help
     contents = File.read("#{__dir__}/help.txt")
-    if args.include?(:commands) || args.include?(:c)
+    if parser.args.include?(:commands) || parser.args.include?(:c)
       contents = contents.partition("LIST OF COMMANDS")[1..].join
     end
     puts
     puts contents.gsub("{VERSION}", VERSION)
-  end
-
-  # If variable name given, immediately evaluates and outputs value.
-  # Otherwise, starts interactive session.
-  # @param args [Hash]
-  def debug(args)
-    @debug.debug_command(args)
   end
 
   # @!endgroup
