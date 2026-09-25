@@ -28,6 +28,11 @@ class Village
 
   # @!group Command Action Methods
 
+  # Shows the current day number.
+  def show_day
+    puts "\nIt's currently day #{day}."
+  end
+
   # Move on to the next day in the simulation. This is a command action method.
   #
   # Accepts an integer command argument that defines how many days to move

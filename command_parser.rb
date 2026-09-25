@@ -33,6 +33,7 @@ class CommandParser
   # Throws +:quit+ when quit command received.
   def execute
     case action
+    when :day             then @sim.village.show_day
     when :nextday         then @sim.village.next_day
     when :stats           then @sim.village.stats
     when :rename          then @sim.village.rename
