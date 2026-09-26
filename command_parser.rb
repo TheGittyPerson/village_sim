@@ -4,6 +4,7 @@ require_relative "ui_utils"
 require_relative "debugger"
 require_relative "version"
 
+# Parses and executes user-inputted commands.
 class CommandParser
   include UIUtils
 
@@ -42,7 +43,7 @@ class CommandParser
     when :help            then @sim.help
     when :debug           then @sim.debugger.debug
     when :quit, :exit     then throw :quit
-    else error "Command unrecognized :("
+    else error "Action unrecognized :("
     end
   end
 

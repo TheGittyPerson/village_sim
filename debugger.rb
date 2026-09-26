@@ -2,6 +2,7 @@
 
 require_relative "ui_utils"
 
+# For user debugging.
 class Debugger
   include UIUtils
 

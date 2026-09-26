@@ -2,28 +2,41 @@
 
 require "io/console"
 
+require_relative "farm"
 require_relative "ui_utils"
 
-# Represent a village
+# Represents a village.
 class Village
   include UIUtils
+
+  # The keys also act like a list of available buildings
+  BUILDINGS_OBJ_MAPPING = {
+    farms: Farm
+  }.freeze
+
+  attr_reader :name, :money, :population, :happiness, :food, :knowledge,
+              :buildings
 
   # @param sim [VillageSim]
   def initialize(sim)
     @sim = sim
 
-    data = @sim.load_data.fetch(:village_info) do
-      raise "Data missing :village_info"
+    data = @sim.load_data.fetch(:village) do
+      raise "Data missing :village"
     end
 
-    @village_info_keys = []
+    # Simple data items
     @name       = add_data(data, :name, "Unnamed")           # @type [String]
+    @money      = add_data(data, :money, 100)                # @type [Integer]
     @population = add_data(data, :population, 1)             # @type [Integer]
     @happiness  = add_data(data, :happiness, 100)            # @type [Integer]
+    @food       = add_data(data, :food, 0)                   # @type [Integer]
     @knowledge  = add_data(data, :knowledge, 0)              # @type [Integer]
-    add_info_getters
 
-    save_data if data.empty?
+    # Complex data items
+    @buildings  = parse_buildings(data)
+
+    update_data if data.empty?
   end
 
   # @!group Command Action Methods
@@ -33,7 +46,7 @@ class Village
     puts "\nIt's currently day #{day}."
   end
 
-  # Move on to the next day in the simulation. This is a command action method.
+  # Moves on to the next day in the simulation. This is a command action method.
   #
   # Accepts an integer command argument that defines how many days to move
   # ahead by.
@@ -41,7 +54,7 @@ class Village
     incr = @sim.parser.args[:*].first || 1
     puts "\nMoving forward by #{incr} day(s)...\n"
     self.day += incr
-    save_data
+    update_data
   end
 
   # Outputs village stats. This is a command action method.
@@ -65,7 +78,39 @@ class Village
                   @sim.parser.args[:*].first.title
                 end
     puts "\nName successfully set to #{name}!"
-    save_data
+    update_data
+  end
+
+  # @!endgroup
+
+  # @!group Complex Data Item Parsers/Serializers
+
+  # Parses buildings Hashes into +Building+ objects and stores it in @buildings.
+  # @param data [Hash]
+  # @return [Hash]
+  def parse_buildings(data)
+    return {} if data.empty? || !data.include?(:buildings)
+
+    buildings_data = data[:buildings]
+
+    out = {}
+    BUILDINGS_OBJ_MAPPING.each_pair do |building_type, building_cls|
+      out[building_type] = buildings_data[building_type].map { |building_data|
+        building_cls.new(@sim, **building_data)
+      }
+    end
+    out
+  end
+
+  # Serializes buildings into Hashes.
+  # Should only be called by +serialize_data+.
+  # @return [Hash]
+  def serialize_buildings
+    out = {}
+    @buildings.each_pair do |building_type, building_objs|
+      out[building_type] = building_objs.map(&:serialize)
+    end
+    out
   end
 
   # @!endgroup
@@ -78,18 +123,34 @@ class Village
     end
   end
 
-  # Set day number in data Hash. Does *NOT* save to file.
+  # Increase +money+ by the specified amount.
+  # @param amount [Integer]
+  def earn_money(amount)
+    unless amount.is_a? Integer
+      raise TypeError, "Expected Integer, got #{amount.class}"
+    end 
+    @money += amount
+  end
+
+  # Decrease +money+ by the specified amount.
+  # @param amount [Integer]
+  def lose_money(amount)
+    unless amount.is_a? Integer
+      raise TypeError, "Expected Integer, got #{amount.class}"
+    end
+    @money -= [amount, @money].min
+  end
+  
+  # Whether +money+ is +0+.
+  # @return [Boolean]
+  def broke?
+    money.zero?
+  end
+
+  # Sets day number in data Hash. Does *NOT* save to file.
   # @param number [Integer]
   def day=(number)
     @sim.data[:day] = number
-  end
-
-  # Loops through the Symbols in +@village_data_keys+ and creates new getters
-  # methods for each respective instance variable they refer to.
-  def add_info_getters
-    @village_info_keys.each do |key|
-      self.class.send(:define_method, key) { instance_variable_get("@#{key}") }
-    end
   end
 
   # @param str [String]
@@ -122,8 +183,18 @@ class Village
     @happiness = int.clamp(0, 100)
   end
 
+  # Add a getter for the specified name.
+  # @param name [Symbol]
+  def add_getter(name)
+    unless name.is_a? Symbol
+      raise TypeError, "Expected Symbol, got #{name.class}"
+    end
+    self.class.send(:define_method, key) { instance_variable_get("@#{name}") }
+  end
+
   # Performs a normal +fetch+ operation, but also adds the symbol keys to
-  # +@village_data_keys+.
+  # +@simple_data_keys+.
+  # For simple data items that don't require serialization/deserialization.
   # @param data [Hash{Symbol => T}]
   # @param key [Symbol]
   # @param default [D]
@@ -132,20 +203,23 @@ class Village
     raise TypeError, "Expected Hash, got #{data.class}" unless data.is_a? Hash
     raise TypeError, "Expected Symbol, got #{key.class}" unless key.is_a? Symbol
 
-    @village_info_keys << key
+    @simple_data_keys ||= []
+    @simple_data_keys << key
     data.fetch(key, default)
   end
 
-  # Serializes village info as a Hash
+  # Serializes village data as a Hash
   # @return [Hash{Symbol => Object}]
-  def village_info_as_hash
-    @village_info_keys.to_h { |sym|
+  def serialize_data
+    out = @simple_data_keys.to_h { |sym|
       [sym, instance_variable_get("@#{sym}")]
     }
+    out[:buildings] = serialize_buildings
+    out
   end
 
-  # Update +VillageSim.data+ and call the main +save_data+ method.
-  def save_data
-    @sim.data[:village_info]
+  # Updates +VillageSim.data+.
+  def update_data
+    @sim.data[:village] = serialize_data
   end
 end
